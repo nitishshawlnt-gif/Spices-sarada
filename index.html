@@ -152,13 +152,45 @@ button,input,select,textarea{font:inherit}.nav{height:76px;background:#fff;displ
       <label style="grid-column:1/-1">Tagline<input id="eTagline"></label>
     </div>
 
-    <button class="save" style="width:100%; margin-top:20px; font-size:16px; padding:16px" onclick="saveStore()">💾 Save All Store Changes</button>
+    <button class="save" style="width:100%; margin-top:20px; font-size:16px; padding:16px" onclick="saveStore()">💾 Save All Store Changes (Only for you)</button>
+    <button class="save" style="width:100%; margin-top:12px; font-size:16px; padding:16px; background:#14833b" onclick="exportForGitHub()">🚀 Export NEW index.html for GitHub (Everyone sees images)</button>
+    <p style="font-size:12px; color:#b45309; margin-top:8px; background:#fffbeb; padding:8px; border-radius:4px">⚠️ If you only click Save, images stay only in YOUR browser. Click Export and upload the downloaded file to GitHub to make images live for ALL customers.</p>
+    <button class="save" style="width:100%; margin-top:8px; font-size:14px; padding:12px; background:#5f259f" onclick="useDirectLinksInfo()">💡 Best Method: Use Direct Image Links (Instant Live)</button>
     <button class="danger" style="width:100%; margin-top:16px; padding:12px" onclick="resetStore()">Reset Demo Data</button>
   </div>
 </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+function exportForGitHub(){
+  // Take current store (with all your uploaded base64 images) and bake into defaultStore
+  let newDefault = JSON.stringify(store, null, 2);
+  let newHtml = document.documentElement.outerHTML;
+  // Replace defaultStore definition with current store
+  let oldDefaultMatch = newHtml.match(/const defaultStore=\{[\s\S]*?\}\}\};/);
+  if(!oldDefaultMatch){
+    oldDefaultMatch = newHtml.match(/const defaultStore=\{[\s\S]*?\]\};/);
+  }
+  if(oldDefaultMatch){
+    let replacement = "const defaultStore=" + JSON.stringify(store) + ";";
+    newHtml = newHtml.replace(oldDefaultMatch[0], replacement);
+  }
+  // Also replace haldi direct link if still empty - ensure live
+  newHtml = newHtml.replace(/image:\"\"/, 'image:"https://i.ibb.co/23nQpvww/haldi.jpg"');
+  
+  let blob = new Blob([newHtml], {type:'text/html'});
+  let a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'index.html';
+  a.click();
+  alert("Downloaded NEW index.html with ALL your images baked in! Now upload this file to GitHub and EVERY customer will see images.");
+}
+
+function useDirectLinksInfo(){
+  alert("For instant live images (no export needed): Instead of uploading file, paste direct link like https://i.ibb.co/23nQpvww/haldi.jpg into Image URL field. Direct links are visible to everyone instantly!");
+}
+
+</script>
 <script>
 let heroIndex = 0;
 function showHeroSlide(n){
@@ -179,13 +211,15 @@ const defaultStore={
   {title:"SPECIAL WHOLESALE & RETAIL RATES", sub:"Best Quality Spices at Best Price", bn:"পাইকারি ও খুচরা মূল্যে বিশুদ্ধ মশলা ও আটা সংগ্রহ করুন। আজই অর্ডার করুন।", extra:"", btnText:"", btnLink:"", image:""}
  ],
  products:[
-  {id:1,name:"Haldi Guro",en:"Turmeric Powder",cat:"Turmeric",bn:"হলুদ গুঁড়ো",desc:"Deep Yellow Color, Strong Aroma",image:"",variants:[{size:"10g",price:5},{size:"50g",price:25},{size:"100g",price:40},{size:"250g",price:90},{size:"1kg",price:330},{size:"100kg",price:30000}]},
+  {id:1,name:"Haldi Guro",en:"Turmeric Powder",cat:"Turmeric",bn:"হলুদ গুঁড়ো",desc:"Deep Yellow Color, Strong Aroma",image:"https://i.ibb.co/23nQpvww/haldi.jpg",variants:[{size:"10g",price:5},{size:"50g",price:25},{size:"100g",price:40},{size:"250g",price:90},{size:"1kg",price:330}]},
   {id:2,name:"Lonka Guro",en:"Mirchi Powder",cat:"Chilli",bn:"লঙ্কা গুঁড়ো",desc:"Jhaldar, Pure Red",image:"",variants:[{size:"10g",price:7},{size:"50g",price:30},{size:"100g",price:50},{size:"250g",price:115},{size:"1kg",price:420},{size:"100kg",price:40000}]},
   {id:3,name:"Dhone Guro",en:"Dhaniya Powder",cat:"Coriander",bn:"ধনে গুঁড়ো",desc:"Fresh Ground",image:"",variants:[{size:"10g",price:4},{size:"50g",price:20},{size:"100g",price:35},{size:"250g",price:80},{size:"1kg",price:290},{size:"100kg",price:27000}]},
-  {id:5,name:"Atta",en:"Wheat Flour",cat:"Atta",group:"Flour",bn:"আটা",desc:"100% Whole Wheat, Freshly Ground & Pure",image:"",variants:[{size:"500g",price:25},{size:"1kg",price:45},{size:"5kg",price:220},{size:"10kg",price:430}]}
+  {id:4,name:"Jira Guro",en:"Cumin Powder",cat:"Cumin",bn:"জিরা গুঁড়ো",desc:"Pure Cumin",image:"",variants:[{size:"50g",price:30},{size:"100g",price:55},{size:"250g",price:130},{size:"1kg",price:480}]},
+  {id:5,name:"Gol Morich Guro",en:"Black Pepper Powder",cat:"Pepper",bn:"গোল মরিচ গুঁড়ো",desc:"Fresh Ground",image:"",variants:[{size:"50g",price:45},{size:"100g",price:85},{size:"250g",price:200},{size:"1kg",price:750}]},
+  {id:6,name:"Atta",en:"Wheat Flour",cat:"Atta",group:"Flour",bn:"আটা",desc:"100% Whole Wheat, Freshly Ground & Pure",image:"",variants:[{size:"500g",price:25},{size:"1kg",price:45},{size:"5kg",price:220},{size:"10kg",price:430}]}
  ]};
 
-let store = JSON.parse(localStorage.getItem("saradaStore")) || defaultStore;
+let savedStore = JSON.parse(localStorage.getItem("saradaStore")||"null"); if(!savedStore || !savedStore.products || savedStore.products.length < 6) { localStorage.removeItem("saradaStore"); } let store = JSON.parse(localStorage.getItem("saradaStore")) || defaultStore;
 if(!store.slides || store.slides.length < 3) store.slides = defaultStore.slides;
 
 let cart=JSON.parse(localStorage.getItem("saradaCart")||"[]"), wishlist=JSON.parse(localStorage.getItem("saradaWish")||"[]"), category="all";
@@ -345,7 +379,7 @@ function loadAdmin(){
         <label style="grid-column:1/-1">Description<input id="pdesc${i}" value="${p.desc||""}"></label>
 
         <div style="grid-column:1/-1; background:#f9f9f9; padding:12px; border-radius:5px; border:1px solid #ddd">
-          <b style="font-size:14px">Upload Product Picture:</b>
+          <b style="font-size:14px">Upload Product Picture:</b><br><small style="color:green">✅ For GitHub live: Paste direct link https://i.ibb.co/... here (instant for all) OR upload file + Export</small>
           <div class="image-preview-wrapper" style="margin-top:8px">
             <div class="image-preview" style="width:70px;height:70px" id="imgPrevBox-${i}">
               ${p.image ? `<img src="${p.image}" alt="Preview">` : `No Image`}
@@ -480,6 +514,35 @@ function applyStore(){
   renderHero();renderProducts();renderCart();renderBadges();
 }
 applyStore();
+
+function exportForGitHub(){
+  // Take current store (with all your uploaded base64 images) and bake into defaultStore
+  let newDefault = JSON.stringify(store, null, 2);
+  let newHtml = document.documentElement.outerHTML;
+  // Replace defaultStore definition with current store
+  let oldDefaultMatch = newHtml.match(/const defaultStore=\{[\s\S]*?\}\}\};/);
+  if(!oldDefaultMatch){
+    oldDefaultMatch = newHtml.match(/const defaultStore=\{[\s\S]*?\]\};/);
+  }
+  if(oldDefaultMatch){
+    let replacement = "const defaultStore=" + JSON.stringify(store) + ";";
+    newHtml = newHtml.replace(oldDefaultMatch[0], replacement);
+  }
+  // Also replace haldi direct link if still empty - ensure live
+  newHtml = newHtml.replace(/image:\"\"/, 'image:"https://i.ibb.co/23nQpvww/haldi.jpg"');
+  
+  let blob = new Blob([newHtml], {type:'text/html'});
+  let a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'index.html';
+  a.click();
+  alert("Downloaded NEW index.html with ALL your images baked in! Now upload this file to GitHub and EVERY customer will see images.");
+}
+
+function useDirectLinksInfo(){
+  alert("For instant live images (no export needed): Instead of uploading file, paste direct link like https://i.ibb.co/23nQpvww/haldi.jpg into Image URL field. Direct links are visible to everyone instantly!");
+}
+
 </script>
 </body>
 </html>
